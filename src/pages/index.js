@@ -3,29 +3,46 @@ import * as THREE from 'three'
 
 export default function Home() {
 
+  const [scene, setScene] = useState(new THREE.Scene())
+  const [camera, setCamera] = useState()
+  const [renderer, setRenderer] = useState()
+  const [cube, setCube] = useState()
+  const [grid, setGrid] = useState()
+
   const [charged, setCharged] = useState(false)
+  const [animated, setAnimated] = useState(false)
   
-  let scene, camera, renderer, cube
+  const createEnvironment = () => {
+    setCamera(new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000))
+    setRenderer(new THREE.WebGLRenderer({alpha:true}))
+  }
+
+  const createObjects = () => {
+    const geometry = new THREE.BoxGeometry( 1, 1, 1 )
+    const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
+    setCube(new THREE.Mesh( geometry, material ))
+    setGrid(new THREE.GridHelper(100,100))
+  }
 
   const createScene = () => {
-    scene = new THREE.Scene()
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-    renderer = new THREE.WebGLRenderer()
     renderer.setSize( window.innerWidth, window.innerHeight)
 
     document.body.appendChild(renderer.domElement)
    
-    const geometry = new THREE.BoxGeometry( 1, 1, 1 )
-    const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
-    cube = new THREE.Mesh( geometry, material )
     scene.add( cube )
-
-    camera.position.z = 5;
+    scene.add(grid)
+    
+    camera.position.z = 10
+    camera.position.y = 5
+    camera.rotation.x = -0.5
+    camera.rotation.y = 0
+    setCharged(true)
   }
 
   function animate() {
     requestAnimationFrame( animate )
     renderer.render(scene, camera)
+    setAnimated(true)
   }
 
   const rotar = () => {
@@ -44,9 +61,9 @@ export default function Home() {
     
   }
 
-  const stopAnimation = () => {
-    requestAnimationFrame( stopAnimation )
-    renderer.render(scene, camera)
+  const onStart = () => {
+    createEnvironment()
+    createObjects()
   }
   
   return (
@@ -54,21 +71,21 @@ export default function Home() {
       <h1>
         Three js
       </h1>
-      <button onClick={() => createScene()}>
-        Iniciar
+      <button onClick={() => onStart()}>
+        Crear entorno
       </button>
-      <button onClick={() => animate()}>
+      {renderer && <button onClick={() => createScene()}>
+        Crear escena
+      </button>}
+      {charged && <button onClick={() => animate()}>
         Animar
-      </button>
-      <button onClick={() => rotar()}>
+      </button>}
+      {animated && <button onClick={() => rotar()}>
         Rotar
-      </button>
-      <button onClick={() => trasladar()}>
+      </button>}
+      {animated && <button onClick={() => trasladar()}>
         Trasladar
-      </button>
-      <button onClick={() => stopAnimation()}>
-        Stop
-      </button>
+      </button>}
     </main>
   )
 }
