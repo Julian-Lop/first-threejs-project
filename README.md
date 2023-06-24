@@ -1,6 +1,6 @@
 # THREE JS PROJECT USING NEXT JS
 
-### Install
+### First
 
 Follow the next steps to use the project:
 
