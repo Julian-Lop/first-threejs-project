@@ -8,6 +8,8 @@ export default function Home() {
   const [renderer, setRenderer] = useState()
   const [cube, setCube] = useState()
   const [grid, setGrid] = useState()
+  const [light, setLight] = useState()
+  const [plane, setPlane] = useState()
 
   const [charged, setCharged] = useState(false)
   const [animated, setAnimated] = useState(false)
@@ -19,23 +21,40 @@ export default function Home() {
 
   const createObjects = () => {
     const geometry = new THREE.BoxGeometry( 1, 1, 1 )
-    const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
+    const material = new THREE.MeshStandardMaterial( { color: 0x00ff00 } )
+
+    const Planegeometry = new THREE.PlaneGeometry(20,20,32,32)
+    const Planematerial = new THREE.MeshStandardMaterial( { color: 0xff0000 } )
+
     setCube(new THREE.Mesh( geometry, material ))
     setGrid(new THREE.GridHelper(100,100))
+    setLight(new THREE.DirectionalLight(0xffffff,1,10))
+    setPlane(new THREE.Mesh(Planegeometry,Planematerial))
   }
 
   const createScene = () => {
     renderer.setSize( window.innerWidth, window.innerHeight)
-
+    renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement)
    
-    scene.add( cube )
-    scene.add(grid)
-    
-    camera.position.z = 10
-    camera.position.y = 5
-    camera.rotation.x = -0.5
-    camera.rotation.y = 0
+    cube.castShadow = true
+    cube.position.set(1,2,1)
+
+    light.castShadow = true
+    light.position.set(-1.5,1,1)
+
+    plane.receiveShadow = true
+    plane.position.set(0,0,0)
+
+    scene.add(cube)
+    // scene.add(grid)
+    scene.add(light)
+    scene.add(plane)
+
+    camera.position.z = 5
+    camera.position.y = -10
+    camera.rotation.x = 1
+    // camera.rotation.y = 0
     setCharged(true)
   }
 
@@ -71,21 +90,23 @@ export default function Home() {
       <h1>
         Three js
       </h1>
-      <button onClick={() => onStart()}>
-        Crear entorno
-      </button>
-      {renderer && <button onClick={() => createScene()}>
-        Crear escena
-      </button>}
-      {charged && <button onClick={() => animate()}>
-        Animar
-      </button>}
-      {animated && <button onClick={() => rotar()}>
-        Rotar
-      </button>}
-      {animated && <button onClick={() => trasladar()}>
-        Trasladar
-      </button>}
+      <navbar>
+        <button onClick={() => onStart()}>
+          Crear entorno
+        </button>
+        <button onClick={() => createScene()} disabled={!renderer}>
+          Crear escena
+        </button>
+        <button onClick={() => animate()} disabled={!charged}>
+          Animar
+        </button>
+        <button onClick={() => rotar()} disabled={!animated} >
+          Rotar
+        </button>
+        <button onClick={() => trasladar()} disabled={!animated} >
+          Trasladar
+        </button>
+      </navbar>
     </main>
   )
 }
