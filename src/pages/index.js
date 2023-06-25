@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import Router, { useRouter } from 'next/router'
 
 export default function Home() {
+  const router = useRouter()
 
   const [scene, setScene] = useState(new THREE.Scene())
   const [camera, setCamera] = useState()
@@ -144,7 +146,11 @@ export default function Home() {
       <h1>
         Three js
       </h1>
+      
       <navbar>
+        <button onClick={() => router.reload()} style={{background:'#ff0000', color:'#000000'}}>
+          X
+        </button>
         <button onClick={() => onStart()}>
           Crear entorno
         </button>
