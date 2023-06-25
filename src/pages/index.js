@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
 import * as THREE from 'three'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
 export default function Home() {
 
   const [scene, setScene] = useState(new THREE.Scene())
   const [camera, setCamera] = useState()
   const [renderer, setRenderer] = useState()
+  const [controls, setControls] = useState()
+
   const [cube, setCube] = useState()
   const [grid, setGrid] = useState()
   const [light, setLight] = useState()
@@ -13,6 +16,9 @@ export default function Home() {
 
   const [charged, setCharged] = useState(false)
   const [animated, setAnimated] = useState(false)
+
+  const [zoomInRange, setZoomInRange] = useState(3)
+  const [zoomOutRange, setZoomOutRange] = useState(5)
   
   const createEnvironment = () => {
     setCamera(new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000))
@@ -55,12 +61,15 @@ export default function Home() {
     camera.position.y = -10
     camera.rotation.x = 1
     // camera.rotation.y = 0
+
+    controls.update()
     setCharged(true)
   }
 
   function animate() {
     requestAnimationFrame( animate )
     renderer.render(scene, camera)
+    controls.update()
     setAnimated(true)
   }
 
@@ -69,6 +78,7 @@ export default function Home() {
     renderer.render(scene, camera)
     cube.rotation.x += 0.01
     cube.rotation.y += 0.01
+    controls.update()
   }
 
   const trasladar = () => {
@@ -77,13 +87,45 @@ export default function Home() {
     cube.translateY(0)
     cube.translateY(0.01)
     cube.translateY(0)
-    
+    controls.update()
   }
 
   const onStart = () => {
     createEnvironment()
     createObjects()
   }
+
+  const changeZoom = (e) => {
+    controls.enableZoom = JSON.parse(e.target.value)
+    controls.update()
+  }
+
+  const changePanning = (e) => {
+    controls.screenSpacePanning = JSON.parse(e.target.value)
+    controls.update()
+  }
+
+  useEffect(() => {
+    if(plane){
+      const tempcontrol = new OrbitControls(camera, renderer.domElement)
+      setControls(tempcontrol)
+      tempcontrol.minDistance = zoomInRange
+      tempcontrol.maxDistance = zoomOutRange
+    }
+  },[plane])
+
+  useEffect(() => {
+    if(animated){
+      controls.minDistance = zoomInRange
+      controls.maxDistance = zoomOutRange
+    }
+  },[zoomInRange,zoomOutRange])
+
+  useEffect(() => {
+    if(controls){
+      console.log({controls})
+    }
+  }, [controls]);
   
   return (
     <main>
@@ -106,6 +148,45 @@ export default function Home() {
         <button onClick={() => trasladar()} disabled={!animated} >
           Trasladar
         </button>
+      </navbar>
+      <br/>
+      <navbar>
+        <select onChange={(e) => changeZoom(e)}>
+          <option value="">
+            Zoom
+          </option>
+          <option value={true}>
+            Activar
+          </option>
+          <option value={false}>
+            Desactivar
+          </option>
+        </select>
+        <select onChange={(e) => changePanning(e)}>
+          <option value="">
+            Arrastrar
+          </option>
+          <option value={true}>
+            Activar
+          </option>
+          <option value={false}>
+            Desactivar
+          </option>
+        </select>
+        <div style={{textAlign: 'center'}}>
+          <label>
+            {'Zoom mínimo: '+zoomInRange}
+          </label>
+          <br/>
+          <input type="range" name="zoomin" id='zoomin' value={zoomInRange} min={1} max={15} onChange={(e) => setZoomInRange(e.target.value)} step={1} />
+        </div>
+        <div style={{textAlign: 'center'}}>
+          <label>
+            {'Zoom máximo: '+zoomOutRange}
+          </label>
+          <br/>
+          <input type="range" name="zoomout" id='zoomout' value={zoomOutRange} min={1} max={15} onChange={(e) => setZoomOutRange(e.target.value)} step={1} />
+        </div>
       </navbar>
     </main>
   )
