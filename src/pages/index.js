@@ -19,6 +19,7 @@ export default function Home() {
 
   const [zoomInRange, setZoomInRange] = useState(3)
   const [zoomOutRange, setZoomOutRange] = useState(5)
+  const [dampingRange, setDampingRange] = useState(0.1)
   
   const createEnvironment = () => {
     setCamera(new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000))
@@ -101,16 +102,21 @@ export default function Home() {
   }
 
   const changePanning = (e) => {
-    controls.screenSpacePanning = JSON.parse(e.target.value)
+    controls.enableDamping = JSON.parse(e.target.value)
+    controls.update()
+  }
+
+  const changeDamping = (e) => {
+    controls.enablePan = JSON.parse(e.target.value)
     controls.update()
   }
 
   useEffect(() => {
     if(plane){
       const tempcontrol = new OrbitControls(camera, renderer.domElement)
-      setControls(tempcontrol)
       tempcontrol.minDistance = zoomInRange
       tempcontrol.maxDistance = zoomOutRange
+      setControls(tempcontrol)
     }
   },[plane])
 
@@ -122,10 +128,16 @@ export default function Home() {
   },[zoomInRange,zoomOutRange])
 
   useEffect(() => {
-    if(controls){
-      console.log({controls})
+    if(animated){
+      controls.dampingFactor = dampingRange
     }
-  }, [controls]);
+  }, [dampingRange]);
+
+  // useEffect(() => {
+  //   if(controls){
+  //     console.log({controls})
+  //   }
+  // }, [controls]);
   
   return (
     <main>
@@ -151,28 +163,32 @@ export default function Home() {
       </navbar>
       <br/>
       <navbar>
+        
         <select onChange={(e) => changeZoom(e)}>
-          <option value="">
-            Zoom
-          </option>
-          <option value={true}>
-            Activar
-          </option>
-          <option value={false}>
-            Desactivar
-          </option>
+          <option>Zoom</option>
+          <option value={true}>Activar</option>
+          <option value={false}>Desactivar</option>
         </select>
+
+        <select onChange={(e) => changeDamping(e)}>
+          <option>Drag</option>
+          <option value={true}>Activar</option>
+          <option value={false}>Desactivar</option>
+        </select>
+
         <select onChange={(e) => changePanning(e)}>
-          <option value="">
-            Arrastrar
-          </option>
-          <option value={true}>
-            Activar
-          </option>
-          <option value={false}>
-            Desactivar
-          </option>
+          <option>Damping</option>
+          <option value={true}>Activar</option>
+          <option value={false}>Desactivar</option>
         </select>
+        
+        <div style={{textAlign: 'center'}}>
+          <label>
+            {'Factor Damping: '+dampingRange}
+          </label>
+          <br/>
+          <input type="range" name="damping" id='damping' value={dampingRange} min={0.1} max={0.9} onChange={(e) => setDampingRange(e.target.value)} step={0.1} />
+        </div>
         <div style={{textAlign: 'center'}}>
           <label>
             {'Zoom mínimo: '+zoomInRange}
