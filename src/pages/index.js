@@ -154,18 +154,18 @@ export default function Home() {
         <button onClick={() => onStart()}>
           Crear entorno
         </button>
-        <button onClick={() => createScene()} disabled={!renderer}>
+        {renderer && <button onClick={() => createScene()} disabled={!renderer}>
           Crear escena
-        </button>
-        <button onClick={() => animate()} disabled={!charged}>
+        </button>}
+        {charged && <button onClick={() => animate()} disabled={!charged}>
           Animar
-        </button>
-        <button onClick={() => rotar()} disabled={!animated} >
+        </button>}
+        {animated && <button onClick={() => rotar()} disabled={!animated} >
           Rotar
-        </button>
-        <button onClick={() => trasladar()} disabled={!animated} >
+        </button>}
+        {animated && <button onClick={() => trasladar()} disabled={!animated} >
           Trasladar
-        </button>
+        </button>}
       </navbar>
       <br/>
       <navbar>
