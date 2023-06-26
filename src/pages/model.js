@@ -50,8 +50,8 @@ export default function ModelPage() {
 
     // setCube(new THREE.Mesh( geometry, material ))
     setGrid(new THREE.GridHelper(100,100))
-    // setLight(new THREE.DirectionalLight(0xffffff,1,10))
-    // setPlane(new THREE.Mesh(Planegeometry, Planematerial))
+    setLight(new THREE.DirectionalLight(0xffffff,1,100))
+    setPlane(new THREE.Mesh(Planegeometry, Planematerial))
   }
 
   const createScene = () => {
@@ -66,11 +66,11 @@ export default function ModelPage() {
       texture.mapping = THREE.EquirectangularReflectionMapping
       scene.environment = texture
 
-      gltfLoader.load('/scene.gltf', function (gltf) {
+      gltfLoader.load('/glb2.glb', function (gltf) {
         const model = gltf.scene
-        model.scale.set(8, 8, 8)
-        model.position.y = 2
-        model.castShadow = true
+        model.scale.set(3, 3, 3)
+        model.position.y = 1
+        gltf.scene.traverse(function(child) { if (child.isMesh) { child.castShadow = true; child.receiveShadow = true; } })
         scene.add(model)
       })
     })
@@ -80,21 +80,20 @@ export default function ModelPage() {
     // cube.castShadow = true
     // cube.position.set(1,2,1)
 
-    // light.castShadow = true
-    // light.position.set(-1.5,1,1)
+    light.castShadow = true
+    light.position.set(5,8,5)
 
-    // plane.receiveShadow = true
-    // plane.position.set(0,0,0)
+    plane.receiveShadow = true
+    plane.position.set(0,0,0)
+    plane.rotation.x = -1.572
 
     // scene.add(cube)
-    scene.add(grid)
-    // scene.add(light)
-    // scene.add(plane)
+    // scene.add(grid)
+    scene.add(light)
+    scene.add(plane)
 
-    camera.position.z = 10
-    camera.position.y = 20
-    // camera.rotation.x = 1
-    // camera.rotation.y = 0
+    camera.position.z = 15
+    camera.position.y = 10
 
     controls.update()
     setCharged(true)
