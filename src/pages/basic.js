@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
-import Router, { useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import Link from 'next/link'
 
 export default function Basic() {
   const router = useRouter()
@@ -137,17 +136,13 @@ export default function Basic() {
       controls.dampingFactor = dampingRange
     }
   }, [dampingRange]);
-
-  // useEffect(() => {
-  //   if(controls){
-  //     console.log({controls})
-  //   }
-  // }, [controls]);
   
   return (
     <main>
       <h1>
-        Three js
+        <Link href={'/'}>
+          Three js
+        </Link>
       </h1>
       
       <navbar>
@@ -161,13 +156,13 @@ export default function Basic() {
           Crear escena
         </button>}
         {charged && <button onClick={() => animate()} disabled={!charged}>
-          Animar
+          Renderizar
         </button>}
         {animated && <button onClick={() => rotar()} disabled={!animated} >
-          Rotar
+          Animación Rotar
         </button>}
         {animated && <button onClick={() => trasladar()} disabled={!animated} >
-          Trasladar
+          Animación Trasladar
         </button>}
       </navbar>
       <br/>
