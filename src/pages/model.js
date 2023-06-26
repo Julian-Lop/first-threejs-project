@@ -45,8 +45,15 @@ export default function ModelPage() {
     const geometry = new THREE.BoxGeometry( 1, 1, 1 )
     const material = new THREE.MeshStandardMaterial( { color: 0x00ff00 } )
 
+    //Texture
+    const Texture = new THREE.TextureLoader().load('/marble-g358b3b8bd_640.jpg')
+    Texture.wrapS =  Texture.wrapT = THREE.RepeatWrapping
+    Texture.repeat.set(24,24)
+
     const Planegeometry = new THREE.PlaneGeometry(20,20,32,32)
-    const Planematerial = new THREE.MeshStandardMaterial( { color: 0xB9BCFE } )
+    const Planematerial = new THREE.MeshStandardMaterial({map: Texture, side: THREE.DoubleSide } )
+    Planematerial.roughness = .0
+    Planegeometry.metalness = .5
 
     // setCube(new THREE.Mesh( geometry, material ))
     setGrid(new THREE.GridHelper(100,100))
@@ -60,7 +67,7 @@ export default function ModelPage() {
 
     renderer.outputEncoding = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 4
+    renderer.toneMappingExposure = 2
 
     rgbeLoader.load('/MR_INT-001_NaturalStudio_NAD.hdr', function (texture) {
       texture.mapping = THREE.EquirectangularReflectionMapping
@@ -70,6 +77,7 @@ export default function ModelPage() {
         const model = gltf.scene
         model.scale.set(3, 3, 3)
         model.position.y = 1
+        model.position.z = -1
         gltf.scene.traverse(function(child) { if (child.isMesh) { child.castShadow = true; child.receiveShadow = true; } })
         scene.add(model)
       })
