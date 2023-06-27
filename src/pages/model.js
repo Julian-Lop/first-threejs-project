@@ -19,6 +19,7 @@ export default function ModelPage() {
   const [camera, setCamera] = useState()
   const [renderer, setRenderer] = useState()
   const [controls, setControls] = useState()
+  const [cubeCam, setCubeCam] = useState()
 
   const [cube, setCube] = useState()
   const [grid, setGrid] = useState()
@@ -56,7 +57,7 @@ export default function ModelPage() {
       map: Texture, side: THREE.DoubleSide, roughnessMap: Texture,
     })
     Planematerial.roughness = .0
-    Planegeometry.metalness = .5
+    Planematerial.metalness = .2
 
     // setCube(new THREE.Mesh( geometry, material ))
     setGrid(new THREE.GridHelper(100,100))
@@ -85,6 +86,25 @@ export default function ModelPage() {
         gltf.scene.traverse(function(child) { if (child.isMesh) { child.castShadow = true; child.receiveShadow = true; } })
         scene.add(model)
       })
+      gltfLoader.load('/Tea Table01.glb', function (gltf) {
+        const model = gltf.scene
+        // const modelMaterial = new THREE.MeshStandardMaterial({})
+        // modelMaterial.roughness = 0.0
+        model.scale.set(0.6, 0.6, 0.6)
+        model.position.y = 0.0
+        model.position.x = 0
+        model.position.z = 1.5
+        model.rotation.y = 1.6
+        gltf.scene.traverse(function (child) {
+          if (child.isMesh) {
+            child.castShadow = true; child.receiveShadow = true;
+            child.material.roughness = 0.3
+          }
+        })
+        
+        scene.add(model)
+      })
+      
     })
 
     document.body.appendChild(renderer.domElement)
@@ -101,6 +121,7 @@ export default function ModelPage() {
 
     // scene.add(cube)
     // scene.add(grid)
+
     scene.add(light)
     scene.add(plane)
 
@@ -109,6 +130,7 @@ export default function ModelPage() {
 
     controls.update()
     setCharged(true)
+    tempCam.update( renderer, scene );
   }
 
   function animate() {
@@ -116,6 +138,7 @@ export default function ModelPage() {
     renderer.render(scene, camera)
     controls.update()
     setAnimated(true)
+    cubeCam.update( renderer, scene );
   }
 
   const rotar = () => {
