@@ -90,3 +90,26 @@ export class BasicCharacterControllerInput {
         }
     }
 }
+
+export class FinitesStateMachine {
+    constructor () {
+        this._states = {}
+        this._currentState = null
+    }
+
+    _addState (name, type) {
+        this._states[name] = type
+    }
+
+    _setState (name) {
+        const prevState = this._currentState
+
+        if(prevState && ((prevState.Name == name)) ) return prevState.Exit()
+
+        const state = new this._states[name](this)
+
+        this._currentState = state
+
+        state.Enter(prevState)
+    }
+}
