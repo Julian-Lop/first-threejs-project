@@ -49,7 +49,7 @@ export default function ModelPage() {
     //Texture
     const Texture = new THREE.TextureLoader().load('/marble-g358b3b8bd_640.jpg')
     Texture.wrapS =  Texture.wrapT = THREE.RepeatWrapping
-    Texture.repeat.set(24,24)
+    Texture.repeat.set(30,30)
 
     const Planegeometry = new THREE.PlaneGeometry(20, 20, 32, 32)
     const Planematerial = new THREE.MeshStandardMaterial({
@@ -79,9 +79,9 @@ export default function ModelPage() {
 
       gltfLoader.load('/glb2.glb', function (gltf) {
         const model = gltf.scene
-        model.scale.set(3, 3, 3)
-        model.position.y = 1
-        model.position.z = -1
+        model.scale.set(1, 1, 1)
+        model.position.y = 0.328
+        model.position.z = 0
         gltf.scene.traverse(function(child) { if (child.isMesh) { child.castShadow = true; child.receiveShadow = true; } })
         scene.add(model)
       })
