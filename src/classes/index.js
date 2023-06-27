@@ -24,10 +24,10 @@ export class BasicCharacterController {
         this._animations = {}
         this._input = new BasicCharacterControllerInput() 
         // this._stateMachine = // TODO
-        this._loadModels()
+        this.loadModels()
     }
 
-    _loadModels( ) {
+    loadModels( ) {
         // TODO
     }
 }
@@ -46,7 +46,7 @@ export class BasicCharacterControllerInput {
         document.addEventListener('keyup', (e) => this._onKeyUp(e),false)
     }
 
-    _onKeyDown (e) {
+    onKeyDown (e) {
         switch (e.kyCode) {
             case 87: //W
                 this._keys.forward = true
@@ -68,7 +68,7 @@ export class BasicCharacterControllerInput {
         }
     }
 
-    _onKeyUp (e) {
+    onKeyUp (e) {
         switch (e.kyCode) {
             case 87: //W
                 this._keys.forward = false
@@ -91,17 +91,17 @@ export class BasicCharacterControllerInput {
     }
 }
 
-export class FinitesStateMachine {
+export class FiniteStateMachine {
     constructor () {
         this._states = {}
         this._currentState = null
     }
 
-    _addState (name, type) {
+    addState (name, type) {
         this._states[name] = type
     }
 
-    _setState (name) {
+    setState (name) {
         const prevState = this._currentState
 
         if(prevState && ((prevState.Name == name)) ) return prevState.Exit()
@@ -111,5 +111,141 @@ export class FinitesStateMachine {
         this._currentState = state
 
         state.Enter(prevState)
+    }
+
+    update(timeLapsed, input) {
+        if (this._currentState) {
+            this._currentState.update(timeLapsed, input)
+        }
+    }
+}
+
+export class CharacterFSM extends FiniteStateMachine {
+    constructor(proxy) {
+        super()
+        this._proxy = proxy
+        this.addState('idle', IdleState)
+        this.addState('walk', WalkState)
+        this.addState('run', RunState)
+    }
+}
+
+
+export class State {
+    constructor(parent) {
+        this._parent = parent
+    }
+
+    Enter() {
+        
+    }
+
+    Update() {
+        
+    }
+
+    Exit() {
+        
+    }
+}
+
+export class IdleState extends State {
+    constructor(parent) {
+        super(parent)
+    }
+
+    get Name() {
+        return 'idle'
+    }
+
+    Enter(prevState) {
+        const idleAction = this._parent._proxy.animations['idle'].action
+        if (prevState) {
+            const prevAction = this._parent._proxy.animation[prevState.Name].action
+            idleAction.time = 0.0
+            idleAction.enabled = true
+            idleAction.setEffectiveTimeScale(1.0)
+            idleAction.setEffectiveWeight(1.0)
+            idleAction.crossFadeFrom(prevAction, 0.5, true)
+            idleAction.play()
+        } else {
+            idleAction.play()
+        }
+    }
+
+    Update(timeLapse, input) {
+        if (input._keys.forward || input._keys.backward) {
+            this._parent.setState('walk')
+        }
+    }
+
+    Exit() {
+
+    }
+}
+
+export class WalkState extends State {
+    constructor(parent) {
+        super(parent)
+    }
+
+    get Name() {
+        return 'walk'
+    }
+
+    Enter(prevState) {
+        const currentAction = this._parent._proxy._animations['walk'].action
+
+        if (!prevState) {
+            return currentAction.play()
+        }
+        const prevAction = this._parent._proxy._animations[prevState.Name].action
+
+        if (prevState && prevState.Name != 'run') {
+            currentAction.enabled = true
+            currentAction.time = 0.0
+            currentAction.setEffectiveTimeScale(1.0)
+            currentAction.setEffectiveWeight(1.0)
+        }
+        if (prevState && prevState.Name == 'run') {
+            const ratio = currentAction.getClip().duration / prevState.getClip().duration
+            currentAction.time = prevAction.time * ratio
+        }
+        currentAction.crossFadeFrom(prevAction, 0.5, true)
+        currentAction.play()
+    }
+
+    Update() {
+        
+    }
+
+    Exit() {
+        
+    }
+}
+
+export class RunState extends State {
+    constructor() {
+        
+    }
+
+    constructor(parent) {
+        super(parent)
+    }
+
+    get Name() {
+        return 'run'
+    }
+
+    Enter(prevState) {
+        
+    }
+
+    Update() {
+        
+    }
+
+    Exit() {
+        
     }
 }
