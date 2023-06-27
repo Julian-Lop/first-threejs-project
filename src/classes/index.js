@@ -23,7 +23,7 @@ export class BasicCharacterController {
 
         this._animations = {}
         this._input = new BasicCharacterControllerInput() 
-        // this._stateMachine = // TODO
+        this._stateMachine = new CharacterFSM(new basicCharacterControllerProxy(this._animations))
         this.loadModels()
     }
 
@@ -173,7 +173,7 @@ export class IdleState extends State {
         }
     }
 
-    Update(timeLapse, input) {
+    Update(timeLapsed, input) {
         if (input._keys.forward || input._keys.backward) {
             this._parent.setState('walk')
         }
@@ -215,8 +215,15 @@ export class WalkState extends State {
         currentAction.play()
     }
 
-    Update() {
-        
+    Update(timeLapsed,input) {
+        if (input._keys.forward || input._keys.backward) {
+            if (input._keys.shift) {
+                this._parent.setState('run')
+            }
+            return 
+        }
+
+        this._parent.setState('idle')
     }
 
     Exit() {
@@ -238,11 +245,36 @@ export class RunState extends State {
     }
 
     Enter(prevState) {
-        
+        const currentAction = this._parent._proxy._animations['run'].action
+        if (!prevState) {
+            return currentAction.play()
+        }
+
+        const prevAction = this._parent._proxy._animations[prevState.Name].action
+        currentAction.enabled = true
+
+        if (prevState && prevState.Name !== 'walk') {
+            currentAction.time = 0.0
+            currentAction.setEffectiveTimeScale(1.0)
+            currentAction.setEffectiveWeight(1.0)
+        }
+        if (prevState && prevState.Name == 'walk') {
+            const ratio = currentAction.getClip().duration / prevAction.getClip().duration
+            currentAction.time = prevAction.time * ratio
+        }
+
+        currentAction.crossFadeFrom(prevAction, 0.5, true)
+        currentAction.play()
     }
 
-    Update() {
-        
+    Update(timeLapsed,input) {
+        if (input._keys.forward || input._keys.backward) {
+            if (!input._keys.shift) {
+                this._parent.setState('walk')
+            }
+            return
+        }
+        this._parent.setState('idle')
     }
 
     Exit() {
