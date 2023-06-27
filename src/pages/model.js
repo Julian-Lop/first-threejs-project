@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
-import Router, { useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { Reflector } from 'three/examples/jsm/objects/Reflector'
 import Link from 'next/link';
 
 // import hdr from '../../public/MR_INT-001_NaturalStudio_NAD.hdr'
@@ -50,24 +51,27 @@ export default function ModelPage() {
     Texture.wrapS =  Texture.wrapT = THREE.RepeatWrapping
     Texture.repeat.set(24,24)
 
-    const Planegeometry = new THREE.PlaneGeometry(20,20,32,32)
-    const Planematerial = new THREE.MeshStandardMaterial({map: Texture, side: THREE.DoubleSide } )
+    const Planegeometry = new THREE.PlaneGeometry(20, 20, 32, 32)
+    const Planematerial = new THREE.MeshStandardMaterial({
+      map: Texture, side: THREE.DoubleSide, roughnessMap: Texture,
+    })
     Planematerial.roughness = .0
     Planegeometry.metalness = .5
 
     // setCube(new THREE.Mesh( geometry, material ))
     setGrid(new THREE.GridHelper(100,100))
     setLight(new THREE.DirectionalLight(0xffffff,1,100))
-    setPlane(new THREE.Mesh(Planegeometry, Planematerial))
+    setPlane(new THREE.Mesh(Planegeometry,Planematerial))
   }
 
   const createScene = () => {
     renderer.setSize( window.innerWidth, window.innerHeight)
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
     renderer.outputEncoding = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 2
+    renderer.toneMappingExposure = 1.5
 
     rgbeLoader.load('/MR_INT-001_NaturalStudio_NAD.hdr', function (texture) {
       texture.mapping = THREE.EquirectangularReflectionMapping
@@ -194,12 +198,12 @@ export default function ModelPage() {
         {charged && <button onClick={() => animate()} disabled={!charged}>
           Renderizar
         </button>}
-        {animated && <button onClick={() => rotar()} disabled={!animated} >
+        {/* {animated && <button onClick={() => rotar()} disabled={!animated} >
           Animación Rotar
         </button>}
         {animated && <button onClick={() => trasladar()} disabled={!animated} >
           Animación Trasladar
-        </button>}
+        </button>} */}
       </navbar>
       <br/>
       <navbar>
